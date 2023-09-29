@@ -1,0 +1,56 @@
+describe("SauceDemo E-commerce Website Tests", () => {
+  beforeEach(() => {
+    // Visit the website before each test
+    cy.visit("https://www.saucedemo.com/");
+  });
+
+  it("should log in with valid credentials", () => {
+    // Enter username and password, then click the login button
+    cy.get("#user-name").type("standard_user");
+    cy.get("#password").type("secret_sauce");
+    cy.get("#login-button").click();
+
+    // Verify if logged in successfully
+    cy.url().should("eq", "https://www.saucedemo.com/inventory.html");
+    cy.get(".product_label").should("contain.text", "Products");
+  });
+
+  it("should add items to the cart", () => {
+    // Log in with valid credentials
+    cy.get("#user-name").type("standard_user");
+    cy.get("#password").type("secret_sauce");
+    cy.get("#login-button").click();
+
+    // Add two items to the cart
+    cy.get(".inventory_item").eq(0).find(".btn_primary").click();
+    cy.get(".inventory_item").eq(2).find(".btn_primary").click();
+
+    // Go to the cart and verify if items are added
+    cy.get(".shopping_cart_link").click();
+    cy.get(".cart_item").should("have.length", 2);
+  });
+
+  it("should complete the checkout process", () => {
+    // Log in with valid credentials
+    cy.get("#user-name").type("standard_user");
+    cy.get("#password").type("secret_sauce");
+    cy.get("#login-button").click();
+
+    // Add an item to the cart
+    cy.get(".inventory_item").eq(1).find(".btn_primary").click();
+
+    // Go to the cart and click the checkout button
+    cy.get(".shopping_cart_link").click();
+    cy.get(".checkout_button").click();
+
+    // Fill out checkout information and complete the order
+    cy.get("#first-name").type("John");
+    cy.get("#last-name").type("Doe");
+    cy.get("#postal-code").type("12345");
+    cy.get(".cart_button").click();
+
+    // Verify if the order is complete
+    cy.url().should("eq", "https://www.saucedemo.com/checkout-complete.html");
+    cy.get(".complete-header").should("contain.text", "THANK YOU FOR YOUR ORDER");
+  });
+});
